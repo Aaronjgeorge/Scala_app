@@ -1,0 +1,23 @@
+.text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent white transparent; /* Borders are transparent except for bottom */
+    -fx-text-fill: white; /* Text color is set to white */
+
+}
+
+.text-field:focused {
+    -fx-background-color: transparent;
+}
+
+
+
+.text-field-register {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent black transparent; /* Borders are transparent except for bottom */
+    -fx-text-fill: black; /* Text color is set to white */
+
+}
+
+.text-field:focused {
+    -fx-background-color: transparent;
+}

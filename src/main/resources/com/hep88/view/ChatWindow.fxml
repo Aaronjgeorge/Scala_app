@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="482.0" prefWidth="662.0" style="-fx-background-color: #0b6623;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hep88.view.MainWindowController">
+    <children>
+        <SplitPane dividerPositions="0.36666666666666664" prefHeight="482.0" prefWidth="662.0">
+            <items>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: #0b6623;">
+                    <children>
+                        <TextField fx:id="searchFriends" layoutX="14.0" layoutY="14.0" onKeyPressed="#handleSearch" promptText="Search friends..." />
+                        <Button fx:id="addFriend" layoutX="168.0" layoutY="13.0" mnemonicParsing="false" onAction="#handleAdd" style="-fx-background-color: #54577c;" text="Add" textFill="#fafafc" />
+                        <ListView fx:id="friendList" layoutX="14.0" layoutY="46.0" prefHeight="77.0" prefWidth="206.0" />
+                        <VBox layoutX="14.0" layoutY="132.0" prefHeight="121.0" prefWidth="206.0">
+                            <children>
+                                <Label text="Online friends:" textFill="#fafafc">
+                                    <font>
+                                        <Font name="System Bold" size="15.0" />
+                                    </font>
+                                </Label>
+                                <ListView fx:id="onlineList" prefHeight="99.0" prefWidth="206.0" />
+                            </children>
+                        </VBox>
+                        <VBox layoutX="14.0" layoutY="282.0" prefHeight="144.0" prefWidth="206.0">
+                            <children>
+                                <Label text="Chats:" textFill="#fafafc">
+                                    <font>
+                                        <Font name="System Bold" size="15.0" />
+                                    </font>
+                                </Label>
+                                <ListView fx:id="chatList" prefHeight="125.0" prefWidth="206.0" />
+                            </children>
+                        </VBox>
+                        <Button fx:id="createRoom" layoutX="14.0" layoutY="441.0" mnemonicParsing="false" onAction="#handleCreateRoom" prefHeight="25.0" prefWidth="134.0" style="-fx-background-color: #54577c;" text="Create Chatroom" textFill="#fafafc" />
+                        <Button fx:id="deleteMssg" layoutX="156.0" layoutY="441.0" mnemonicParsing="false" onAction="#handleDeleteMssg" prefHeight="25.0" prefWidth="59.0" style="-fx-background-color: #54577c;" text="Delete" textFill="#fafafc" />
+                        <Button fx:id="removeFriend" layoutX="161.0" layoutY="254.0" mnemonicParsing="false" onAction="#handleRemove" style="-fx-background-color: #54577c;" text="Remove" textFill="#fafafc" />
+                    </children>
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="480.0" prefWidth="428.0">
+                    <children>
+                        <VBox prefHeight="480.0" prefWidth="415.0">
+                            <children>
+                                <ListView fx:id="mssgList" prefHeight="405.0" prefWidth="415.0" />
+                                <TextArea fx:id="mssgArea" onKeyPressed="#handleType" prefHeight="72.0" prefWidth="415.0" promptText="Type message..." />
+                            </children>
+                        </VBox>
+                    </children>
+                </AnchorPane>
+            </items>
+        </SplitPane>
+    </children>
+</AnchorPane>

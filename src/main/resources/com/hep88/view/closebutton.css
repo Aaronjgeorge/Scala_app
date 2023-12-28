@@ -1,0 +1,10 @@
+.button-close {
+    -fx-background-radius: 0;
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+}
+
+.button-close:hover {
+    -fx-background-color: #ff6b6b; /* red shade when hovered */
+    -fx-text-fill: white;
+}

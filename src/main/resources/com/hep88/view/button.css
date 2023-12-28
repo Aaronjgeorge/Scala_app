@@ -1,0 +1,25 @@
+.button-login {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-width: 2;
+}
+
+.button-login:hover {
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+
+.button-register{
+    -fx-background-color: transparent;
+    -fx-text-fill: black;
+    -fx-border-color: black;
+    -fx-border-width: 2;
+}
+
+
+.button-register:hover {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+}
