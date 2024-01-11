@@ -7,9 +7,11 @@ import scalafx.event.ActionEvent
 import scalafx.scene.control.TextField
 import com.hep88.{ChatClient, ChatServer, Client}
 import scalafx.application.Platform
+import scalafx.stage.Stage
 @sfxml
 class MainWindowController(private val txtUsername: TextField,
-                           private val txtPassword: TextField) {
+                           private val txtPassword: TextField,
+                           var currentStage: Stage) {
 
   var chatClientRef: Option[ActorRef[ChatClient.Command]] = None
   var chatServerRef: Option[ActorRef[ChatServer.Command]] = None

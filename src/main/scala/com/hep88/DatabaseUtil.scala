@@ -23,7 +23,7 @@ object DatabaseUtil {
   def userExists(username: String): Boolean = {
     val conn = getConnection
     try {
-      val stmt = conn.prepareStatement("SELECT COUNT(*) FROM users WHERE username = ?")
+      val stmt = conn.prepareStatement("SELECT COUNT(*) FROM user WHERE username = ?")
       stmt.setString(1, username)
       val rs: ResultSet = stmt.executeQuery()
       rs.next() && rs.getInt(1) > 0
@@ -33,12 +33,18 @@ object DatabaseUtil {
   }
 
   def createUser(username: String, password: String): Boolean = {
+    print("Started")
     val conn = getConnection
     try {
       val stmt = conn.prepareStatement("INSERT INTO user (username, password) VALUES (?, ?)")
       stmt.setString(1, username)
       stmt.setString(2, password)
+
       stmt.executeUpdate() > 0
+    } catch {
+      case e: Exception =>
+        e.printStackTrace()
+        false
     } finally {
       print("User created")
       conn.close()
@@ -94,7 +100,6 @@ object DatabaseUtil {
       conn.close()
     }
   }
-
   def addFriend(currentUserName: String, friendUsername: String): Boolean = {
     val conn = getConnection
     try {
@@ -119,11 +124,60 @@ object DatabaseUtil {
       }
 
       if (currentUserId.isDefined && friendUserId.isDefined) {
-        // Step 2: Add the friend's user ID to the user's list of friends
-        val addStmt = conn.prepareStatement("INSERT INTO friendships (user_id, friend_id) VALUES (?, ?)")
+        // Step 2: Add the friend's user ID to the user's list of friends (both ways)
+        val addStmt = conn.prepareStatement("INSERT INTO friendships (user_id, friend_id) VALUES (?, ?), (?, ?)")
         addStmt.setInt(1, currentUserId.get)
         addStmt.setInt(2, friendUserId.get)
-        addStmt.executeUpdate() > 0 // Returns true if the row is inserted
+        addStmt.setInt(3, friendUserId.get)
+        addStmt.setInt(4, currentUserId.get)
+        addStmt.executeUpdate() > 0 // Returns true if the rows are inserted
+      } else {
+        false // User or friend username not found
+      }
+    } catch {
+      case e: SQLException =>
+        println("SQLException occurred: " + e.getMessage)
+        false
+      case e: Exception =>
+        println("Exception occurred: " + e.getMessage)
+        false
+    } finally {
+      conn.close()
+    }
+  }
+
+  def deleteFriend(currentUserName: String, friendUsername: String): Boolean = {
+    val conn = getConnection
+    try {
+      // Step 1: Find the user ID of the current user and the friend
+      val findCurrentUserStmt = conn.prepareStatement("SELECT user_id FROM user WHERE username = ?")
+      findCurrentUserStmt.setString(1, currentUserName)
+      val rsCurrentUser = findCurrentUserStmt.executeQuery()
+
+      val findFriendUserStmt = conn.prepareStatement("SELECT user_id FROM user WHERE username = ?")
+      findFriendUserStmt.setString(1, friendUsername)
+      val rsFriendUser = findFriendUserStmt.executeQuery()
+
+      var currentUserId: Option[Int] = None
+      var friendUserId: Option[Int] = None
+
+      if (rsCurrentUser.next()) {
+        currentUserId = Some(rsCurrentUser.getInt("user_id"))
+      }
+
+      if (rsFriendUser.next()) {
+        friendUserId = Some(rsFriendUser.getInt("user_id"))
+      }
+
+      if (currentUserId.isDefined && friendUserId.isDefined) {
+        // Step 2: Delete the friendship from the friendships table (both ways)
+        val deleteStmt = conn.prepareStatement(
+          "DELETE FROM friendships WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)")
+        deleteStmt.setInt(1, currentUserId.get)
+        deleteStmt.setInt(2, friendUserId.get)
+        deleteStmt.setInt(3, friendUserId.get)
+        deleteStmt.setInt(4, currentUserId.get)
+        deleteStmt.executeUpdate() > 0 // Returns true if the rows are deleted
       } else {
         false // User or friend username not found
       }
@@ -217,7 +271,40 @@ object DatabaseUtil {
       conn.close()
     }
   }
+  def deleteChatroom(selectedChat: String): Boolean = {
+    val groupId = selectedChat.takeWhile(_.isDigit).toInt // Extracting group_id from the beginning of the string
+    val conn = getConnection
+    try {
+      // Start a transaction
+      conn.setAutoCommit(false)
 
+      // Step 1: Delete from group_members table
+      val deleteGroupMembersStmt = conn.prepareStatement("DELETE FROM group_members WHERE group_id = ?")
+      deleteGroupMembersStmt.setInt(1, groupId)
+      deleteGroupMembersStmt.executeUpdate()
+
+      // Step 2: Delete from chat_group table
+      val deleteChatGroupStmt = conn.prepareStatement("DELETE FROM chat_group WHERE group_id = ?")
+      deleteChatGroupStmt.setInt(1, groupId)
+      deleteChatGroupStmt.executeUpdate()
+
+      // Commit the transaction
+      conn.commit()
+      true
+    } catch {
+      case e: SQLException =>
+        println("SQLException occurred: " + e.getMessage)
+        conn.rollback() // Rollback in case of an exception
+        false
+      case e: Exception =>
+        println("Exception occurred: " + e.getMessage)
+        conn.rollback()
+        false
+    } finally {
+      conn.setAutoCommit(true) // Reset auto commit to true
+      conn.close()
+    }
+  }
   def createChatroom(addedUsers: ObservableSet[String]): Unit = {
     val conn = getConnection
     val currentTimestamp: Timestamp = Timestamp.valueOf(LocalDateTime.now()) // use

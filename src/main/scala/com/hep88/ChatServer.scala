@@ -16,10 +16,14 @@ object ChatServer {
   case class LoginUser(username: String, password: String, replyTo: ActorRef[LoginResult]) extends Command
   case class SearchUser(query: String, replyTo: ActorRef[Seq[String]]) extends Command
   case class AddFriend(currentUserName: String, friendUsername: String, replyTo: ActorRef[Boolean]) extends Command
+  case class DeleteFriend(currentUserName: String, friendUsername: String, replyTo: ActorRef[Boolean]) extends Command
+  case class DeleteChat(chatName: String, replyTo: ActorRef[Boolean]) extends Command
+
   case class FetchFriends(userName: String, replyTo: ActorRef[Seq[String]]) extends Command
   sealed trait RegistrationResult
   case object RegistrationSuccess extends RegistrationResult
   case object RegistrationFailure extends RegistrationResult
+  case class UserStatusUpdate(userId: Int, isOnline: Boolean) extends Command
 
   sealed trait LoginResult
   case class LoginSuccess(validatedUserId: Int) extends LoginResult
@@ -46,7 +50,7 @@ object ChatServer {
   }
   val ServerKey: ServiceKey[ChatServer.Command] = ServiceKey("chatServer")
   var serverRef: Option[ActorRef[Command]] = None
-  var onlineUsers: Set[ActorRef[ChatClient.Command]] = _
+  var onlineUsers: Set[ActorRef[ChatClient.Command]] = Set.empty
 
   def apply(): Behavior[ChatServer.Command] =
     Behaviors.setup { context =>
@@ -55,6 +59,7 @@ object ChatServer {
         context.messageAdapter(listing => ListingResponse(listing))
       Behaviors.receiveMessage {
         case FindClients =>
+          print("We're tring")
           context.system.receptionist ! Receptionist.Find(ChatClient.ClientKey, listingAdapter)
           Behaviors.same
 
@@ -62,12 +67,14 @@ object ChatServer {
           onlineUsers = listings
           onlineUsers.foreach{userRef =>
             userRef ! ChatClient.UpdateOnlineUserList
+            userRef ! ChatClient.UpdateChatList
           }
           println(s"Received client server listing: $onlineUsers")
           Behaviors.same
         case RegisterUser(username, password, replyTo) =>
           if (!DatabaseUtil.userExists(username)) {
             if (DatabaseUtil.createUser(username, password)) {
+              print("Yeah it works")
               replyTo ! RegistrationSuccess
             } else {
               replyTo ! RegistrationFailure
@@ -99,6 +106,16 @@ object ChatServer {
 
         case AddFriend(currentUserName, friendUsername, replyTo) =>
           val result = DatabaseUtil.addFriend(currentUserName, friendUsername)
+          replyTo ! result  // result is a Boolean
+          Behaviors.same
+
+        case DeleteFriend(currentUserName, friendUsername, replyTo) =>
+          val result = DatabaseUtil.deleteFriend(currentUserName, friendUsername)
+          replyTo ! result  // result is a Boolean
+          Behaviors.same
+
+        case DeleteChat(chatName, replyTo) =>
+          val result = DatabaseUtil.deleteChatroom(chatName)
           replyTo ! result  // result is a Boolean
           Behaviors.same
 

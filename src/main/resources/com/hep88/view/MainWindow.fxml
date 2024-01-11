@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -12,10 +13,10 @@
    <children>
       <ImageView blendMode="SRC_ATOP" fitHeight="146.0" fitWidth="259.0" layoutX="300.0" layoutY="98.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@com/hep88/view/logo123.png" />
+            <Image url="@logo123.png" />
          </image>
       </ImageView>
-      <Button layoutX="574.0" mnemonicParsing="false" prefHeight="25.0" onAction="#handleExit" prefWidth="26.0" styleClass="button-close" stylesheets="@com/hep88/view/closebutton.css" text="X">
+      <Button layoutX="574.0" mnemonicParsing="false" onAction="#handleExit" prefHeight="25.0" prefWidth="26.0" styleClass="button-close" stylesheets="@closebutton.css" text="X">
          <font>
             <Font name="System Bold" size="12.0" />
          </font>
@@ -27,7 +28,7 @@
       </Text>
       <Pane layoutX="-7.0" layoutY="-9.0" prefHeight="410.0" prefWidth="259.0" style="-fx-background-color: black;">
          <children>
-            <Button layoutX="94.0" layoutY="270.0" mnemonicParsing="false" onAction="#handleLogin" prefHeight="29.0" prefWidth="73.0" styleClass="button-login" stylesheets="@com/hep88/view/button.css" text="Login" />
+            <Button layoutX="94.0" layoutY="270.0" mnemonicParsing="false" onAction="#handleLogin" prefHeight="29.0" prefWidth="73.0" styleClass="button-login" stylesheets="@button.css" text="Login" />
             <Text fill="WHITE" layoutX="70.0" layoutY="111.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Welcome Back!">
                <font>
                   <Font size="18.0" />
@@ -35,9 +36,9 @@
             </Text>
             <Text fill="WHITE" layoutX="34.0" layoutY="172.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
             <Text fill="WHITE" layoutX="36.0" layoutY="223.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" />
-            <Button layoutX="65.0" layoutY="318.0" onAction="#handleCreateAccount" mnemonicParsing="false" styleClass="button-login" stylesheets="@com/hep88/view/button.css" text="Create New Account" />
-            <TextField fx:id="txtUsername" layoutX="103.0" layoutY="149.0" prefHeight="25.0" prefWidth="124.0" stylesheets="@com/hep88/view/textfield.css" />
-            <TextField fx:id="txtPassword" layoutX="103.0" layoutY="205.0" prefHeight="25.0" prefWidth="124.0" stylesheets="@com/hep88/view/textfield.css" />
+            <Button layoutX="65.0" layoutY="318.0" mnemonicParsing="false" onAction="#handleCreateAccount" styleClass="button-login" stylesheets="@button.css" text="Create New Account" />
+            <TextField fx:id="txtUsername" layoutX="103.0" layoutY="149.0" prefHeight="25.0" prefWidth="124.0" stylesheets="@textfield.css" />
+            <PasswordField fx:id="txtPassword" layoutX="103.0" layoutY="206.0" prefHeight="16.0" prefWidth="124.0" stylesheets="@textfield.css" />
          </children>
       </Pane>
    </children>

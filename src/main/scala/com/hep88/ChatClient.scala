@@ -8,7 +8,6 @@ import javafx.collections.{FXCollections, ObservableSet, SetChangeListener}
 import com.hep88.ChatServer.UpdateUserMessages
 
 
-
 object UserSession {
   var currentUserName: Option[String] = None
 }
@@ -29,16 +28,26 @@ object ChatClient {
 
   case class AddFriendRequest(friendUsername: String, callback: Boolean => Unit) extends Command
   case class AddFriendResponse(result: Boolean) extends Command
+  case class DeleteFriendRequest(friendUsername: String, callback: Boolean => Unit) extends Command
+  case class DeleteFriendResponse(result: Boolean) extends Command
+  case class DeleteChatRequest(chatName: String, callback: Boolean => Unit) extends Command
+  case class DeleteChatResponse(result: Boolean) extends Command
   case class FetchFriendsRequest(callback: Seq[String] => Unit) extends Command
   case class FetchFriendsResponse(friendsList: Seq[String]) extends Command
   case object UpdateOnlineUserList extends Command
+  case object UpdateChatList extends Command
+
   case class SetUserId(userId: Int) extends Command
   case class ServerRefRequest(callback: (Option[ActorRef[ChatServer.Command]]) => Unit) extends Command
   case class ServerRefResponse(result: ChatServer.ServerRefResult) extends Command
   case class ChangeCurrentChatRoom(chatRoom: Int) extends Command
   case class SendMessage(groupId: Int) extends Command
   case class UpdateChatView(groupId: Int) extends Command
-  case object GoOffline extends Command
+  case object UpdateStatus extends Command
+  case object updateFriendList extends Command
+  case object updateChats extends Command
+
+
   case class CreateGroupChatResponse(result: Boolean) extends Command
   case object start extends Command
 
@@ -82,7 +91,8 @@ object ChatClient {
         context.messageAdapter(searchResults => SearchResponse(searchResults))
       val addFriendResponseAdapter: ActorRef[Boolean] =
         context.messageAdapter(result => AddFriendResponse(result))
-
+      val deleteChatResponseAdapter: ActorRef[Boolean] =
+        context.messageAdapter(result => DeleteChatResponse(result))
       val registrationResponseAdapter: ActorRef[ChatServer.RegistrationResult] =
         context.messageAdapter(rsp => RegisterResponse(rsp))
 
@@ -186,7 +196,30 @@ object ChatClient {
           addFriendCallback = None
           Behaviors.same
 
+        case DeleteFriendRequest(friendUsername, callback) =>
+          val userName = UserSession.currentUserName.get // Get the current user's username
+          remoteOpt.foreach { remote =>
+            remote ! ChatServer.DeleteFriend(userName, friendUsername, addFriendResponseAdapter)
+          }
+          addFriendCallback = Some(callback)
+          Behaviors.same
 
+        case DeleteFriendResponse(result) =>
+          addFriendCallback.foreach(_(result))
+          addFriendCallback = None
+          Behaviors.same
+
+        case DeleteChatRequest(chatName, callback) =>
+          remoteOpt.foreach { remote =>
+            remote ! ChatServer.DeleteChat(chatName, deleteChatResponseAdapter)
+          }
+          addFriendCallback = Some(callback)
+          Behaviors.same
+
+        case DeleteChatResponse(result) =>
+          addFriendCallback.foreach(_(result))
+          addFriendCallback = None
+          Behaviors.same
 
 
         case FetchFriendsRequest(callback) =>
@@ -207,7 +240,13 @@ object ChatClient {
           Behaviors.same
 
         case UpdateOnlineUserList =>
+          print("Friend list updated")
           Client.populateOnlineFriendsList(userId)
+          Behaviors.same
+
+        case UpdateChatList =>
+          print("Chat list updated")
+          Client.populateChatList()
           Behaviors.same
 
         case SetUserId(validatedUserId) =>
@@ -247,13 +286,25 @@ object ChatClient {
         case UpdateChatView(groupId) =>
           Client.updateChat(groupId)
           Behaviors.same
-
-        case GoOffline =>
-          print("Going offline")
+        case updateFriendList =>
+          print("updating")
           remoteOpt.foreach { remote =>
             remote ! ChatServer.FindClients
           }
           Behaviors.same
+        case updateChats =>
+          print("updating")
+          remoteOpt.foreach { remote =>
+            remote ! ChatServer.FindClients
+          }
+          Behaviors.same
+
+        case UpdateStatus =>
+          remoteOpt.foreach { remote =>
+            remote ! ChatServer.FindClients
+          }
+          Behaviors.same
+
       }
       }
 }

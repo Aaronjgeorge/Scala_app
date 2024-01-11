@@ -4,7 +4,7 @@ import scalafx.scene.control.Alert.AlertType
 import akka.actor.typed.ActorRef
 import scalafxml.core.macros.sfxml
 import scalafx.event.ActionEvent
-import com.hep88.{ChatClient, Client, DatabaseUtil}
+import com.hep88.{ChatClient, ChatServer, Client, DatabaseUtil}
 import scalafx.application.Platform
 import scalafx.scene.input.MouseEvent
 import scalafx.stage.Stage
@@ -26,7 +26,17 @@ class ChatWindowController (
                             private val quitClient: Button,
                             var currentStage: Stage){
   var chatClientRef: Option[ActorRef[ChatClient.Command]] = None
-
+  var chatServerRef: Option[ActorRef[ChatServer.Command]] = None
+  def showAlertDialog(message: String): Unit = {
+    new Alert(AlertType.Information) {
+      title = "Alert"
+      headerText = "Information"
+      contentText = message
+    }.showAndWait()
+  }
+  def handleExit(): Unit={
+    Client.exitWindow()
+  }
   def handleSearch(actionEvent: ActionEvent): Unit = {
     val searchQuery = searchFriends.text.value
     chatClientRef.foreach(_ ! ChatClient.SearchRequest(searchQuery, updateFriendList))
@@ -47,19 +57,73 @@ class ChatWindowController (
         chatClientRef.foreach(_ ! ChatClient.AddFriendRequest(selectedFriend, handleAddFriendResponse))
       case None =>
         // Handle the case where no friend is selected
-        println("No friend selected.")
+        showAlertDialog("Please select a friend!")
+    }
+  }
+  def handleDeleteChat(actionEvent: ActionEvent): Unit = {
+    val selectionModel = chatList.selectionModel()
+    val selectedChatOption = Option(selectionModel.getSelectedItem)
+
+    selectedChatOption match {
+      case Some(selectedChat) =>
+        chatClientRef.foreach(_ ! ChatClient.DeleteChatRequest(selectedChat, handleDeleteChatResponse))
+      case None =>
+        showAlertDialog("Please select a chat!")
+    }
+  }
+
+  def handleDeleteFriend(actionEvent: ActionEvent): Unit = {
+    val selectionModel = onlineList.selectionModel()
+    val selectedFriendOption = Option(selectionModel.getSelectedItem)
+
+    selectedFriendOption match {
+      case Some(selectedFriend) =>
+        chatClientRef.foreach(_ ! ChatClient.DeleteFriendRequest(selectedFriend, handleDeleteFriendResponse))
+      case None =>
+        showAlertDialog("No Friend Selected!")
+    }
+  }
+
+
+  def handleDeleteChatResponse(isSuccess: Boolean): Unit = {
+    if (isSuccess) {
+      Platform.runLater(() => {
+        Client.populateChatList()
+        chatServerRef.foreach(_ ! ChatServer.FindClients)
+        showAlertDialog("Chat Deleted successfully")
+
+      })
+    } else {
+      Platform.runLater(() => {
+        showAlertDialog("This chat does not exist!")
+      })
+    }
+  }
+  def handleDeleteFriendResponse(isSuccess: Boolean): Unit = {
+    if (isSuccess) {
+      Platform.runLater(() => {
+        chatClientRef.foreach(_ ! ChatClient.updateFriendList)
+        showAlertDialog("Friend Deleted successfully")
+
+      })
+    } else {
+      Platform.runLater(() => {
+        // Update UI to reflect failure
+        showAlertDialog("This user does not exist!")
+      })
     }
   }
   def handleAddFriendResponse(isSuccess: Boolean): Unit = {
     if (isSuccess) {
       Platform.runLater(() => {
-        // Update UI to reflect success
-        println("Friend added successfully.")
+        chatClientRef.foreach(_ ! ChatClient.updateFriendList)
+        showAlertDialog("Friend Added successfully")
+
       })
     } else {
       Platform.runLater(() => {
         // Update UI to reflect failure
-        println("Failed to add friend.")
+        showAlertDialog("This user is already your friend!")
       })
     }
   }
@@ -126,8 +190,8 @@ class ChatWindowController (
 
   def handleQuit(actionEvent: ActionEvent): Unit = {
     DatabaseUtil.goOffline()
+    chatClientRef.foreach(_ ! ChatClient.UpdateStatus)
     Client.exitWindow()
-    chatClientRef.foreach(_ ! ChatClient.GoOffline)
   }
 
 

@@ -1,7 +1,7 @@
 package com.hep88.view
 
 import akka.actor.typed.ActorRef
-import com.hep88.{ChatClient, Client, DatabaseUtil}
+import com.hep88.{ChatClient, ChatServer, Client, DatabaseUtil}
 import javafx.collections.{FXCollections, ObservableList, ObservableSet}
 import scalafx.event.ActionEvent
 import scalafx.scene.control.Alert.AlertType
@@ -15,6 +15,8 @@ class CreateChatWindowController(
                                   private val userList: ListView[String]
                                 ) {
   var chatClientRef: Option[ActorRef[ChatClient.Command]] = None
+  var chatServerRef: Option[ActorRef[ChatServer.Command]] = None
+
   var addedUsers: ObservableSet[String] = FXCollections.observableSet[String]()
   var selectedUser: String = ""
 
@@ -53,6 +55,8 @@ class CreateChatWindowController(
       showAlertDialog("Need to have at least one user added to create a chatroom.")
     } else {
       DatabaseUtil.createChatroom(addedUsers)
+      Client.populateChatList()
+      chatServerRef.foreach(_ ! ChatServer.FindClients)
       Client.closeCreateChatWindow()
     }
   }

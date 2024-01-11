@@ -14,7 +14,7 @@
    <children>
       <AnchorPane prefHeight="43.0" prefWidth="662.0">
          <children>
-            <Button fx:id="quitClient" layoutX="580.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleQuit" prefHeight="26.0" prefWidth="68.0" style="-fx-background-color: #54577c;" text="Quit" textFill="WHITE" />
+            <Button fx:id="quitClient" layoutX="580.0" layoutY="8.0" mnemonicParsing="false" onAction="#handleQuit" prefHeight="26.0" prefWidth="68.0" style="-fx-background-color: black;" styleClass="button-login" stylesheets="@button.css" text="Quit" textFill="WHITE" />
          </children>
       </AnchorPane>
       <SplitPane dividerPositions="0.36666666666666664" layoutY="42.0" prefHeight="514.0" prefWidth="662.0">
@@ -22,7 +22,7 @@
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" style="-fx-background-color: #000000;">
                <children>
                   <TextField fx:id="searchFriends" layoutX="14.0" layoutY="14.0" prefHeight="25.0" prefWidth="119.0" promptText="Search friends..." />
-                  <Button fx:id="addFriend" layoutX="191.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleAddFriend" style="-fx-background-color: #54577c;" text="Add" textFill="#fafafc" />
+                  <Button fx:id="addFriend" layoutX="194.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleAddFriend" style="-fx-background-color: black;" styleClass="button-login" stylesheets="@button.css" text="Add" textFill="#fafafc" />
                   <ListView fx:id="friendList" layoutX="14.0" layoutY="46.0" prefHeight="77.0" prefWidth="206.0" />
                   <VBox layoutX="14.0" layoutY="132.0" prefHeight="121.0" prefWidth="206.0">
                      <children>
@@ -44,10 +44,10 @@
                         <ListView fx:id="chatList" onMouseClicked="#handleChatClick" prefHeight="125.0" prefWidth="206.0" />
                      </children>
                   </VBox>
-                  <Button fx:id="createRoom" layoutX="14.0" layoutY="441.0" mnemonicParsing="false" onAction="#openCreateChatWindow" prefHeight="25.0" prefWidth="134.0" style="-fx-background-color: #54577c;" text="Create Chatroom" textFill="#fafafc" />
-                  <Button fx:id="chatDelete" layoutX="156.0" layoutY="441.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="59.0" style="-fx-background-color: #54577c;" text="Delete" textFill="#fafafc" />
-                  <Button fx:id="removeFriend" layoutX="161.0" layoutY="254.0" mnemonicParsing="false" style="-fx-background-color: #54577c;" text="Remove" textFill="#fafafc" />
-                  <Button fx:id="searchFriend" layoutX="137.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleSearch" style="-fx-background-color: #54577c;" text="Search" textFill="#fafafc" />
+                  <Button fx:id="createRoom" layoutX="14.0" layoutY="441.0" mnemonicParsing="false" onAction="#openCreateChatWindow" prefHeight="25.0" prefWidth="134.0" style="-fx-background-color: black;" styleClass="button-login" stylesheets="@button.css" text="Create Chatroom" textFill="#fafafc" />
+                  <Button fx:id="chatDelete" layoutX="156.0" layoutY="441.0" mnemonicParsing="false" onAction="#handleDeleteChat" prefHeight="25.0" prefWidth="59.0" style="-fx-background-color: black;" styleClass="button-login" stylesheets="@button.css" text="Delete" textFill="#fafafc" />
+                  <Button fx:id="removeFriend" layoutX="161.0" layoutY="254.0" mnemonicParsing="false" onAction="#handleDeleteFriend" style="-fx-background-color: black;" styleClass="button-login" stylesheets="@button.css" text="Remove" textFill="#fafafc" />
+                  <Button fx:id="searchFriend" layoutX="135.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleSearch" style="-fx-background-color: black;" styleClass="button-login" stylesheets="@button.css" text="Search" textFill="#fafafc" />
                </children>
             </AnchorPane>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="480.0" prefWidth="428.0">

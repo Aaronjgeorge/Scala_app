@@ -15,8 +15,8 @@ object Client extends JFXApp {
   val greeterMain: ActorSystem[ChatClient.Command] = ActorSystem(ChatClient(), "ChatSystem")
   greeterMain ! ChatClient.start
 
-  val loader = new FXMLLoader(null, NoDependencyResolver)
-  loader.load(getClass.getResourceAsStream("view/MainWindow.fxml"))
+  val loader = new FXMLLoader(getClass.getResource("view/MainWindow.fxml"), NoDependencyResolver)
+  loader.load()
 
   // Obtain the controller and pass the chatClientRef
   val controller = loader.getController[com.hep88.view.MainWindowController#Controller]()
@@ -36,34 +36,6 @@ object Client extends JFXApp {
   private var chatList: ListView[String] = _
   private var chatMessages: ListView[String] = _
 
-
-  def openRegisterWindow(): Unit = {
-    val loader = new FXMLLoader(getClass.getResource("view/RegisterWindow.fxml"), NoDependencyResolver)
-    val root = loader.load[javafx.scene.Parent]
-    val registerStage = new Stage()
-    registerStage.scene = new Scene(root)
-
-    val controller = loader.getController[com.hep88.view.RegisterWindowController#Controller]()
-    controller.currentStage = registerStage // Add this line
-
-    registerStage.show()
-  }
-
-  def closeMainWindow(): Unit = {
-    stage.close()
-  }
-
-  def exitWindow(): Unit={
-    System.exit(0)
-  }
-  def openMainWindow(): Unit = {
-    val loader = new FXMLLoader(getClass.getResource("view/MainWindow.fxml"), NoDependencyResolver)
-    val root = loader.load[javafx.scene.Parent]
-    val registerStage = new Stage()
-    registerStage.scene = new Scene(root)
-    registerStage.show()
-  }
-
   def openChatWindow(): Unit = {
     val loader = new FXMLLoader(getClass.getResource("view/ChatWindow.fxml"), NoDependencyResolver)
     val root = loader.load[javafx.scene.Parent]
@@ -80,6 +52,42 @@ object Client extends JFXApp {
     registerStage.scene = new Scene(root)
     registerStage.show()
   }
+
+  def openRegisterWindow(): Unit = {
+    val loader = new FXMLLoader(getClass.getResource("view/RegisterWindow.fxml"), NoDependencyResolver)
+    val root = loader.load[javafx.scene.Parent]
+    val registerStage = new Stage()
+    registerStage.scene = new Scene(root)
+
+    val controller = loader.getController[com.hep88.view.RegisterWindowController#Controller]()
+    controller.chatClientRef = Some(greeterMain)
+    controller.currentStage = registerStage // Add this line
+
+    registerStage.show()
+  }
+
+  def closeMainWindow(): Unit = {
+    stage.close()
+  }
+
+  def exitWindow(): Unit={
+    System.exit(0)
+  }
+  def openMainWindow(): Unit = {
+    if (stage == null || stage.scene == null) {
+      val loader = new FXMLLoader(getClass.getResource("view/MainWindow.fxml"), NoDependencyResolver)
+      val root = loader.load[javafx.scene.Parent]
+
+      stage = new JFXApp.PrimaryStage()
+      stage.initStyle(StageStyle.Undecorated)
+      stage.scene = new Scene(root)
+      val controller = loader.getController[com.hep88.view.MainWindowController#Controller]()
+      controller.chatClientRef = Some(greeterMain)
+    }
+    stage.show()
+  }
+
+
 
   def populateOnlineFriendsList(receivedUserId: Int): Unit = {
     val onlineFriends: ObservableList[String] = DatabaseUtil.getOnlineFriends(receivedUserId)
@@ -101,11 +109,16 @@ object Client extends JFXApp {
     viewingStage.show()
   }
 
-  def closeCreateChatWindow(): Unit = {
-    // get info from database and add to listview
+  def populateChatList():Unit={
     val chatRoomsSet = DatabaseUtil.populateChatRoomList()
     val chatRoomsList = FXCollections.observableArrayList[String](chatRoomsSet)
     chatList.setItems(chatRoomsList)
+    print("populatedd the chat list")
+  }
+
+  def closeCreateChatWindow(): Unit = {
+    // get info from database and add to listview
+
     viewingStage.close()
   }
 
