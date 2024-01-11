@@ -35,7 +35,7 @@
             </Text>
             <Text fill="WHITE" layoutX="34.0" layoutY="172.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
             <Text fill="WHITE" layoutX="36.0" layoutY="223.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" />
-            <Button layoutX="65.0" layoutY="318.0" mnemonicParsing="false" styleClass="button-login" stylesheets="@com/hep88/view/button.css" text="Create New Account" />
+            <Button layoutX="65.0" layoutY="318.0" onAction="#handleCreateAccount" mnemonicParsing="false" styleClass="button-login" stylesheets="@com/hep88/view/button.css" text="Create New Account" />
             <TextField fx:id="txtUsername" layoutX="103.0" layoutY="149.0" prefHeight="25.0" prefWidth="124.0" stylesheets="@com/hep88/view/textfield.css" />
             <TextField fx:id="txtPassword" layoutX="103.0" layoutY="205.0" prefHeight="25.0" prefWidth="124.0" stylesheets="@com/hep88/view/textfield.css" />
          </children>
